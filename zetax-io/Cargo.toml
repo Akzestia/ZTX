@@ -1,0 +1,17 @@
+[package]
+name = "zetax_io"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.47.1", features = ["full"] }
+proc-macro2 = "1.0.101"
+quote = "1.0.40"
+syn = { version = "2.0.106", features = ["full"] }
+core_affinity = "0.8.3"
+env_logger = "0.11.8"
+futures = "0.3.31"
+once_cell = "1.21.3"
+rayon = "1.11.0"
+tquic = "1.6.0"
+tquic_tools = "1.6.0"
