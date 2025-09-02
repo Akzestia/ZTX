@@ -4,7 +4,7 @@ ZTX - a simple, fast RoQ (RPC over QUIC) framework, built using [TQUIC](https://
 
 # Performance
 
-ZTX can be ass fast as 4x the speed of gRPC, but you should note that ZTX contains
+ZTX can be as fast as **4x** the speed of gRPC, but you should note that ZTX contains
 a wide range of specific optimizations, so creating a fair benchmark is a bit complicated
 
 # Usage
