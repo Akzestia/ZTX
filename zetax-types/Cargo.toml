@@ -1,0 +1,27 @@
+[package]
+name = "zetax_types"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bytes = "1.10.1"
+capnp = "0.21.4"
+capnpc = "0.21.2"
+clap = { version = "=4.2.5", features = ["derive"] }
+core_affinity = "0.8.3"
+env_logger = "0.11.8"
+futures = "0.3.31"
+inventory = "0.3.20"
+log = "0.4.27"
+mio = "1.0.4"
+num_cpus = "1.17.0"
+rayon = "1.11.0"
+rustc-hash = "2.1.1"
+slab = "0.4.11"
+socket2 = "0.6.0"
+tokio = { version = "1.47.1", features = ["full"] }
+tquic = "1.6.0"
+tquic_tools = "1.6.0"
+zetax_macro = { path = "../zetax-macro" }
+zetax_io = { path = "../zetax-io" }
+async-std = "1.13.2"
