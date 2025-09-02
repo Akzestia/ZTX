@@ -1,6 +1,11 @@
 # ZTX
 
-ZTX - a simple, fast QUIC framework, built using [TQUIC](https://tquic.net/).
+ZTX - a simple, fast RoQ (RPC over QUIC) framework, built using [TQUIC](https://tquic.net/).
+
+# Performance
+
+ZTX can be ass fast as 4x the speed of gRPC, but you should note that ZTX contains
+a wide range of specific optimizations, so creating a fair benchmark is a bit complicated
 
 # Usage
 
@@ -28,7 +33,7 @@ pub async fn echo(_ctx: RpcContext, input: Vec<u8>) -> RpcResult<Vec<u8>> {
 
 // Register RPC
 fn main() -> Result<()> {
-    // U must register ALL of your defined RPCs beforee run_server()
+    // You must register ALL of your defined RPCs before run_server()
     register_rpc(&RPC_ECHO);
 
     // Server setup
@@ -64,6 +69,5 @@ let _ = client.call("ping")?;
 # Docs
 
 More info available in [docs](docs) folder
-
 
 # License [MIT](LICENSE)
