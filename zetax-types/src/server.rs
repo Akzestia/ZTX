@@ -89,6 +89,178 @@ impl Default for ServerSettings {
     }
 }
 
+impl ServerSettings {
+    pub fn builder() -> ServerSettingsBuilder {
+        ServerSettingsBuilder::new()
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct ServerSettingsBuilder {
+    inner: ServerSettings,
+}
+
+impl ServerSettingsBuilder {
+    pub fn new() -> Self {
+        Self {
+            inner: ServerSettings::default(),
+        }
+    }
+
+    pub fn cert_file(mut self, path: impl Into<String>) -> Self {
+        self.inner.cert_file = path.into();
+        self
+    }
+
+    pub fn key_file(mut self, path: impl Into<String>) -> Self {
+        self.inner.key_file = path.into();
+        self
+    }
+
+    pub fn listen(mut self, addr: SocketAddr) -> Self {
+        self.inner.listen = addr;
+        self
+    }
+
+    pub fn workers(mut self, workers: usize) -> Self {
+        self.inner.workers = workers;
+        self
+    }
+
+    pub fn idle_timeout(mut self, timeout: u64) -> Self {
+        self.inner.idle_timeout = timeout;
+        self
+    }
+
+    pub fn handshake_timeout(mut self, timeout: u64) -> Self {
+        self.inner.handshake_timeout = timeout;
+        self
+    }
+
+    pub fn max_concurrent_conns(mut self, val: u32) -> Self {
+        self.inner.max_concurrent_conns = val;
+        self
+    }
+
+    pub fn max_connection_window(mut self, val: u64) -> Self {
+        self.inner.max_connection_window = val;
+        self
+    }
+
+    pub fn max_stream_window(mut self, val: u64) -> Self {
+        self.inner.max_stream_window = val;
+        self
+    }
+
+    pub fn initial_max_data(mut self, val: u64) -> Self {
+        self.inner.initial_max_data = val;
+        self
+    }
+
+    pub fn initial_max_stream_data_bidi_local(mut self, val: u64) -> Self {
+        self.inner.initial_max_stream_data_bidi_local = val;
+        self
+    }
+
+    pub fn initial_max_stream_data_bidi_remote(mut self, val: u64) -> Self {
+        self.inner.initial_max_stream_data_bidi_remote = val;
+        self
+    }
+
+    pub fn initial_max_stream_data_uni(mut self, val: u64) -> Self {
+        self.inner.initial_max_stream_data_uni = val;
+        self
+    }
+
+    pub fn initial_max_streams_bidi(mut self, val: u64) -> Self {
+        self.inner.initial_max_streams_bidi = val;
+        self
+    }
+
+    pub fn initial_max_streams_uni(mut self, val: u64) -> Self {
+        self.inner.initial_max_streams_uni = val;
+        self
+    }
+
+    pub fn congestion_control(mut self, algo: CongestionControlAlgorithm) -> Self {
+        self.inner.congestion_control = algo;
+        self
+    }
+
+    pub fn initial_congestion_window(mut self, val: u64) -> Self {
+        self.inner.initial_congestion_window = val;
+        self
+    }
+
+    pub fn min_congestion_window(mut self, val: u64) -> Self {
+        self.inner.min_congestion_window = val;
+        self
+    }
+
+    pub fn slow_start_thresh(mut self, val: u64) -> Self {
+        self.inner.slow_start_thresh = val;
+        self
+    }
+
+    pub fn initial_rtt(mut self, val: u64) -> Self {
+        self.inner.initial_rtt = val;
+        self
+    }
+
+    pub fn enable_pacing(mut self, enable: bool) -> Self {
+        self.inner.enable_pacing = enable;
+        self
+    }
+
+    pub fn enable_multipath(mut self, enable: bool) -> Self {
+        self.inner.enable_multipath = enable;
+        self
+    }
+
+    pub fn multipath_algorithm(mut self, algo: MultipathAlgorithm) -> Self {
+        self.inner.multipath_algorithm = algo;
+        self
+    }
+
+    pub fn enable_retry(mut self, enable: bool) -> Self {
+        self.inner.enable_retry = enable;
+        self
+    }
+
+    pub fn enable_stateless_reset(mut self, enable: bool) -> Self {
+        self.inner.enable_stateless_reset = enable;
+        self
+    }
+
+    pub fn cid_len(mut self, len: usize) -> Self {
+        self.inner.cid_len = len;
+        self
+    }
+
+    pub fn anti_amplification_factor(mut self, val: usize) -> Self {
+        self.inner.anti_amplification_factor = val;
+        self
+    }
+
+    pub fn send_batch_size(mut self, val: usize) -> Self {
+        self.inner.send_batch_size = val;
+        self
+    }
+
+    pub fn zerortt_buffer_size(mut self, val: usize) -> Self {
+        self.inner.zerortt_buffer_size = val;
+        self
+    }
+
+    pub fn max_undecryptable_packets(mut self, val: usize) -> Self {
+        self.inner.max_undecryptable_packets = val;
+        self
+    }
+
+    pub fn build(self) -> ServerSettings {
+        self.inner
+    }
+}
 struct ServerHandler {
     buf: Vec<u8>,
     rpc: RpcServer,
