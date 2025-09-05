@@ -10,8 +10,7 @@ a wide range of specific optimizations, so creating a fair benchmark is a bit co
 # Usage
 
 > [!TIP]
-> See [examples]([examples](https://github.com/Akzestia/ZTX-Examples)) for basic ztx client/server implementation
-
+> See [examples](https://github.com/Akzestia/ZTX-Examples) for basic ztx client/server implementation
 
 # Setting up server
 
