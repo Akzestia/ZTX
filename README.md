@@ -13,13 +13,19 @@ a wide range of specific optimizations, so creating a fair benchmark is a bit co
 
 ```rs
 fn main() -> Result<()> {
-    let mut settings = ServerSettings::default();
-    settings.listen = "0.0.0.0:4433".parse().unwrap();
-    // Optional: set max amount of workers
-    settings.workers = num_cpus::get();
+    register_rpc(&RPC_ECHO);
+    register_rpc(&RPC_HELLO);
+
+    let settings = ServerSettings::builder()
+        .workers(num_cpus::get())
+        .listen("0.0.0.0:4433".parse().unwrap())
+        .cert_file("cert.crt")
+        .key_file("cert.key")
+        .build();
 
     run_server(settings)
 }
+
 ```
 
 # Register RPC (Server side)
