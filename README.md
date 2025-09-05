@@ -9,6 +9,10 @@ a wide range of specific optimizations, so creating a fair benchmark is a bit co
 
 # Usage
 
+> [!TIP]
+> See [examples](examples) for basic ztx client/server implementation
+
+
 # Setting up server
 
 ```rs
