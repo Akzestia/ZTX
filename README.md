@@ -1,9 +1,9 @@
 # ZTX
 
 [![Crates.io](https://img.shields.io/crates/v/ztx.svg)](https://crates.io/crates/ztx)
-[![Crates.io](https://img.shields.io/crates/v/ztx_types.svg)](https://crates.io/crates/ztx_types)
-[![Crates.io](https://img.shields.io/crates/v/ztx_macro.svg)](https://crates.io/crates/ztx_macro)
-[![Crates.io](https://img.shields.io/crates/v/ztx_io.svg)](https://crates.io/crates/ztx_io)
+[![Crates.io](https://img.shields.io/crates/v/zetaxx_types.svg)](https://crates.io/crates/ztx_types)
+[![Crates.io](https://img.shields.io/crates/v/zetax_macro.svg)](https://crates.io/crates/ztx_macro)
+[![Crates.io](https://img.shields.io/crates/v/zetax_io.svg)](https://crates.io/crates/ztx_io)
 
 ZTX - a simple, blazingly fast RoQ (RPC over QUIC) framework, built using [TQUIC](https://tquic.net/).
 
