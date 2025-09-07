@@ -1,3 +1,3 @@
 [workspace]
 resolver = "3"
-members = ["zetax-io", "zetax-macro", "zetax-types"]
+members = ["zetax-io", "zetax-macro", "zetax-types", "ztx"]
