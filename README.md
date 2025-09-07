@@ -1,5 +1,10 @@
 # ZTX
 
+[![Crates.io](https://img.shields.io/crates/v/cql_lsp.svg)](https://crates.io/crates/ztx)
+[![Crates.io](https://img.shields.io/crates/v/cql_lsp.svg)](https://crates.io/crates/ztx_types)
+[![Crates.io](https://img.shields.io/crates/v/cql_lsp.svg)](https://crates.io/crates/ztx_macro)
+[![Crates.io](https://img.shields.io/crates/v/cql_lsp.svg)](https://crates.io/crates/ztx_io)
+
 ZTX - a simple, blazingly fast RoQ (RPC over QUIC) framework, built using [TQUIC](https://tquic.net/).
 
 # Performance
