@@ -23,6 +23,8 @@ fn main() -> Result<()> {
         .listen("0.0.0.0:4433".parse().unwrap())
         .cert_file("cert.crt")
         .key_file("cert.key")
+        .request_client_auth(true)
+        .alpn(b"h3")
         .build();
 
     run_server(settings)
