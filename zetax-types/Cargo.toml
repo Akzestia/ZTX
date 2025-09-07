@@ -1,5 +1,11 @@
 [package]
 name = "zetax_types"
+description = "ZTX is a simple & fast RoQ (RPC over QUIC) framework built using TQUIC"
+authors = ["アクゼスティア <akzestia@gmail.com>"]
+license = "MIT"
+keywords = ["roq", "rpc", "quic", "networking", "framework"]
+categories = ["network-programming", "asynchronous", "command-line-utilities"]
+repository = "https://github.com/Akzestia/ztx"
 version = "0.1.0"
 edition = "2024"
 
@@ -22,6 +28,7 @@ socket2 = "0.6.0"
 tokio = { version = "1.47.1", features = ["full"] }
 tquic = "1.6.0"
 tquic_tools = "1.6.0"
-zetax_macro = { path = "../zetax-macro" }
-zetax_io = { path = "../zetax-io" }
+zetax_macro = { path = "../zetax-macro", version = "0.1.0" }
+zetax_io = { path = "../zetax-io", version = "0.1.0" }
 async-std = "1.13.2"
+tokio-stream = "0.1.17"
