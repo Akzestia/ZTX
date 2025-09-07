@@ -1896,6 +1896,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-stream"
+version = "0.1.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eca58d7bba4a75707817a2c44174253f9236b2d5fbd055602e9d5c07c139a047"
+dependencies = [
+ "futures-core",
+ "pin-project-lite",
+ "tokio",
+]
+
+[[package]]
 name = "tquic"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2478,8 +2489,18 @@ dependencies = [
  "slab",
  "socket2",
  "tokio",
+ "tokio-stream",
  "tquic",
  "tquic_tools",
  "zetax_io",
  "zetax_macro",
+]
+
+[[package]]
+name = "ztx"
+version = "1.0.0"
+dependencies = [
+ "zetax_io",
+ "zetax_macro",
+ "zetax_types",
 ]
