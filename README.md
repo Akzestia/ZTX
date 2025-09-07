@@ -1,7 +1,7 @@
 # ZTX
 
 [![Crates.io](https://img.shields.io/crates/v/ztx.svg)](https://crates.io/crates/ztx)
-[![Crates.io](https://img.shields.io/crates/v/zetaxx_types.svg)](https://crates.io/crates/ztx_types)
+[![Crates.io](https://img.shields.io/crates/v/zetax_types.svg)](https://crates.io/crates/ztx_types)
 [![Crates.io](https://img.shields.io/crates/v/zetax_macro.svg)](https://crates.io/crates/ztx_macro)
 [![Crates.io](https://img.shields.io/crates/v/zetax_io.svg)](https://crates.io/crates/ztx_io)
 
