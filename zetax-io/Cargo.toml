@@ -1,5 +1,11 @@
 [package]
 name = "zetax_io"
+description = "ZTX is a simple & fast RoQ (RPC over QUIC) framework built using TQUIC"
+authors = ["アクゼスティア <akzestia@gmail.com>"]
+license = "MIT"
+keywords = ["roq", "rpc", "quic", "networking", "framework"]
+categories = ["network-programming", "asynchronous", "command-line-utilities"]
+repository = "https://github.com/Akzestia/ztx"
 version = "0.1.0"
 edition = "2024"
 
