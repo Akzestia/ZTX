@@ -1,6 +1,5 @@
 use std::net::SocketAddr;
 
-use futures::StreamExt;
 use log::info;
 use zetax_types::client::QuicRpcClient;
 use zetax_types::sockets::Result;
@@ -12,7 +11,11 @@ async fn main() -> Result<()> {
     let server: SocketAddr = "127.0.0.1:4433".parse().unwrap();
     info!("connecting to {}", server);
 
-    let mut client = QuicRpcClient::builder(server).idle_timeout(5_000).build()?;
+    let mut client = QuicRpcClient::builder(server)
+        .idle_timeout(5_000)
+        .tls_insecure(false)
+        .alpn(b"h3")
+        .build()?;
 
     let resp = client.call_with("echo", b"hello world")?;
     println!("echo => {}", String::from_utf8_lossy(&resp));
