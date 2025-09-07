@@ -1,12 +1,14 @@
-use std::net::SocketAddr;
-use std::time::Instant;
-
 use bytes::Bytes;
 use futures::StreamExt;
 use futures::executor::block_on;
 use log::{debug, error, info};
 use mio::Events;
 use mio::event::Event;
+use std::collections::HashMap;
+use std::net::SocketAddr;
+use std::rc::Rc;
+use std::sync::Arc;
+use std::time::Instant;
 
 use tquic::{
     Config, CongestionControlAlgorithm, Connection, Endpoint, MultipathAlgorithm, PacketInfo,
@@ -50,6 +52,10 @@ pub struct ServerSettings {
     pub send_batch_size: usize,
     pub zerortt_buffer_size: usize,
     pub max_undecryptable_packets: usize,
+    // NEW: ALPNs for server
+    pub alpn: Vec<Vec<u8>>,
+    // (optional) NEW: whether to request/require client auth (maps to the bool in new_server_config)
+    pub request_client_auth: bool,
 }
 
 impl Default for ServerSettings {
@@ -85,6 +91,8 @@ impl Default for ServerSettings {
             send_batch_size: 64,
             zerortt_buffer_size: 1000,
             max_undecryptable_packets: 10,
+            alpn: vec![b"rpc".to_vec()], // NEW default ALPN
+            request_client_auth: true,   // NEW default same as your previous code
         }
     }
 }
@@ -111,149 +119,139 @@ impl ServerSettingsBuilder {
         self.inner.cert_file = path.into();
         self
     }
-
     pub fn key_file(mut self, path: impl Into<String>) -> Self {
         self.inner.key_file = path.into();
         self
     }
-
     pub fn listen(mut self, addr: SocketAddr) -> Self {
         self.inner.listen = addr;
         self
     }
-
     pub fn workers(mut self, workers: usize) -> Self {
         self.inner.workers = workers;
         self
     }
-
-    pub fn idle_timeout(mut self, timeout: u64) -> Self {
-        self.inner.idle_timeout = timeout;
+    pub fn idle_timeout(mut self, timeout_ms: u64) -> Self {
+        self.inner.idle_timeout = timeout_ms;
         self
     }
-
-    pub fn handshake_timeout(mut self, timeout: u64) -> Self {
-        self.inner.handshake_timeout = timeout;
+    pub fn handshake_timeout(mut self, timeout_ms: u64) -> Self {
+        self.inner.handshake_timeout = timeout_ms;
         self
     }
-
     pub fn max_concurrent_conns(mut self, val: u32) -> Self {
         self.inner.max_concurrent_conns = val;
         self
     }
-
     pub fn max_connection_window(mut self, val: u64) -> Self {
         self.inner.max_connection_window = val;
         self
     }
-
     pub fn max_stream_window(mut self, val: u64) -> Self {
         self.inner.max_stream_window = val;
         self
     }
-
     pub fn initial_max_data(mut self, val: u64) -> Self {
         self.inner.initial_max_data = val;
         self
     }
-
     pub fn initial_max_stream_data_bidi_local(mut self, val: u64) -> Self {
         self.inner.initial_max_stream_data_bidi_local = val;
         self
     }
-
     pub fn initial_max_stream_data_bidi_remote(mut self, val: u64) -> Self {
         self.inner.initial_max_stream_data_bidi_remote = val;
         self
     }
-
     pub fn initial_max_stream_data_uni(mut self, val: u64) -> Self {
         self.inner.initial_max_stream_data_uni = val;
         self
     }
-
     pub fn initial_max_streams_bidi(mut self, val: u64) -> Self {
         self.inner.initial_max_streams_bidi = val;
         self
     }
-
     pub fn initial_max_streams_uni(mut self, val: u64) -> Self {
         self.inner.initial_max_streams_uni = val;
         self
     }
-
     pub fn congestion_control(mut self, algo: CongestionControlAlgorithm) -> Self {
         self.inner.congestion_control = algo;
         self
     }
-
     pub fn initial_congestion_window(mut self, val: u64) -> Self {
         self.inner.initial_congestion_window = val;
         self
     }
-
     pub fn min_congestion_window(mut self, val: u64) -> Self {
         self.inner.min_congestion_window = val;
         self
     }
-
     pub fn slow_start_thresh(mut self, val: u64) -> Self {
         self.inner.slow_start_thresh = val;
         self
     }
-
     pub fn initial_rtt(mut self, val: u64) -> Self {
         self.inner.initial_rtt = val;
         self
     }
-
     pub fn enable_pacing(mut self, enable: bool) -> Self {
         self.inner.enable_pacing = enable;
         self
     }
-
     pub fn enable_multipath(mut self, enable: bool) -> Self {
         self.inner.enable_multipath = enable;
         self
     }
-
     pub fn multipath_algorithm(mut self, algo: MultipathAlgorithm) -> Self {
         self.inner.multipath_algorithm = algo;
         self
     }
-
     pub fn enable_retry(mut self, enable: bool) -> Self {
         self.inner.enable_retry = enable;
         self
     }
-
     pub fn enable_stateless_reset(mut self, enable: bool) -> Self {
         self.inner.enable_stateless_reset = enable;
         self
     }
-
     pub fn cid_len(mut self, len: usize) -> Self {
         self.inner.cid_len = len;
         self
     }
-
     pub fn anti_amplification_factor(mut self, val: usize) -> Self {
         self.inner.anti_amplification_factor = val;
         self
     }
-
     pub fn send_batch_size(mut self, val: usize) -> Self {
         self.inner.send_batch_size = val;
         self
     }
-
     pub fn zerortt_buffer_size(mut self, val: usize) -> Self {
         self.inner.zerortt_buffer_size = val;
         self
     }
-
     pub fn max_undecryptable_packets(mut self, val: usize) -> Self {
         self.inner.max_undecryptable_packets = val;
+        self
+    }
+
+    // NEW:
+    pub fn alpn(mut self, proto: impl AsRef<[u8]>) -> Self {
+        self.inner.alpn = vec![proto.as_ref().to_vec()];
+        self
+    }
+    pub fn alpn_many<I, S>(mut self, protos: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<[u8]>,
+    {
+        self.inner.alpn = protos.into_iter().map(|p| p.as_ref().to_vec()).collect();
+        self
+    }
+    // NEW:
+    pub fn request_client_auth(mut self, enable: bool) -> Self {
+        self.inner.request_client_auth = enable;
         self
     }
 
@@ -261,9 +259,11 @@ impl ServerSettingsBuilder {
         self.inner
     }
 }
+
 struct ServerHandler {
     buf: Vec<u8>,
     rpc: RpcServer,
+    acc: HashMap<u64, Vec<u8>>, // per-stream accumulator
 }
 
 impl ServerHandler {
@@ -278,6 +278,7 @@ impl ServerHandler {
         Ok(Self {
             buf: vec![0; MAX_BUF_SIZE],
             rpc,
+            acc: HashMap::new(),
         })
     }
 }
@@ -286,31 +287,33 @@ impl TransportHandler for ServerHandler {
     fn on_conn_created(&mut self, conn: &mut Connection) {
         debug!("{} connection created", conn.trace_id());
     }
-
     fn on_conn_established(&mut self, conn: &mut Connection) {
         debug!("{} connection established", conn.trace_id());
     }
-
     fn on_conn_closed(&mut self, conn: &mut Connection) {
         debug!("{} connection closed", conn.trace_id());
     }
-
     fn on_stream_created(&mut self, conn: &mut Connection, stream_id: u64) {
         debug!("{} stream {} created", conn.trace_id(), stream_id);
     }
 
     fn on_stream_readable(&mut self, conn: &mut Connection, stream_id: u64) {
         while let Ok((n, fin)) = conn.stream_read(stream_id, &mut self.buf) {
+            {
+                // short scope to end &mut borrow before map ops
+                let entry = self.acc.entry(stream_id).or_default();
+                entry.extend_from_slice(&self.buf[..n]);
+            }
             if !fin {
                 continue;
             }
 
-            let req = &self.buf[..n];
+            let req = self.acc.remove(&stream_id).unwrap_or_default();
+
             let mut parts = req.splitn(2, |b| *b == b'\n');
             let name = parts.next().unwrap_or(&[]);
             let payload = parts.next().unwrap_or(&[]);
             let rpc_name = std::str::from_utf8(name).unwrap_or("");
-
             let ctx = RpcContext::default();
 
             // Unary RPC
@@ -356,17 +359,17 @@ impl TransportHandler for ServerHandler {
             let mut out = b"ERR\nunknown rpc: ".to_vec();
             out.extend_from_slice(rpc_name.as_bytes());
             let _ = conn.stream_write(stream_id, Bytes::from(out), true);
+            return;
         }
     }
 
     fn on_stream_writable(&mut self, conn: &mut Connection, stream_id: u64) {
         debug!("{} stream {} writable", conn.trace_id(), stream_id);
     }
-
     fn on_stream_closed(&mut self, conn: &mut Connection, stream_id: u64) {
         debug!("{} stream {} closed", conn.trace_id(), stream_id);
+        self.acc.remove(&stream_id);
     }
-
     fn on_new_token(&mut self, conn: &mut Connection, token: Vec<u8>) {
         debug!("{} new token {:?}", conn.trace_id(), token);
     }
@@ -375,7 +378,7 @@ impl TransportHandler for ServerHandler {
 pub struct Worker {
     endpoint: Endpoint,
     poll: mio::Poll,
-    sock: &'static QuicSocket,
+    sock: Arc<QuicSocket>,
     recv_buf: Vec<u8>,
 }
 
@@ -410,18 +413,21 @@ impl Worker {
         config.set_zerortt_buffer_size(settings.zerortt_buffer_size);
         config.set_max_undecryptable_packets(settings.max_undecryptable_packets);
 
-        let alpn = vec![b"rpc".to_vec()];
-        let tls_config =
-            TlsConfig::new_server_config(&settings.cert_file, &settings.key_file, alpn, true)?;
+        // NEW: ALPN from settings, client-auth toggle mapped to bool arg
+        let tls_config = TlsConfig::new_server_config(
+            &settings.cert_file,
+            &settings.key_file,
+            settings.alpn.clone(),
+            settings.request_client_auth,
+        )?;
         config.set_tls_config(tls_config);
 
         let poll = mio::Poll::new()?;
         let registry = poll.registry();
-        let sock_owned = QuicSocket::new_reuseport(&settings.listen, registry, 1)?;
-        // Leak socket to satisfy 'static lifetime required by Endpoint
-        let sock_static: &'static QuicSocket = Box::leak(Box::new(sock_owned));
-        let sender: std::rc::Rc<dyn tquic::PacketSendHandler> =
-            std::rc::Rc::new(StaticSockSender { sock: sock_static });
+        let sock_owned = Arc::new(QuicSocket::new_reuseport(&settings.listen, registry, 1)?);
+        let sender: Rc<dyn tquic::PacketSendHandler> = Rc::new(StaticSockSender {
+            sock: sock_owned.clone(),
+        });
 
         let handler = ServerHandler::new()?;
         let endpoint = Endpoint::new(Box::new(config), true, Box::new(handler), sender);
@@ -429,7 +435,7 @@ impl Worker {
         Ok(Self {
             endpoint,
             poll,
-            sock: sock_static,
+            sock: sock_owned,
             recv_buf: vec![0u8; MAX_BUF_SIZE],
         })
     }
