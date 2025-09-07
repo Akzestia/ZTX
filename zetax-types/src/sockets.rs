@@ -154,7 +154,7 @@ impl QuicSocket {
 
 // A 'static sender wrapper that Endpoint can store as Rc<dyn PacketSendHandler + 'static>.
 pub struct StaticSockSender {
-    pub sock: &'static QuicSocket,
+    pub sock: std::sync::Arc<QuicSocket>,
 }
 
 impl PacketSendHandler for StaticSockSender {
